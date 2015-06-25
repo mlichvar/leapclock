@@ -27,7 +27,7 @@
 
 #include <ncurses.h>
 
-#define CLOCK_COLS 35
+#define CLOCK_COLS 37
 #define CLOCK_LINES 7
 
 static int debug;
@@ -177,10 +177,10 @@ int main(int argc, char **argv) {
 		tv_tai = tv_utc;
 		tv_tai.tv_sec += tai_offset;
 
-		print_time(line + 2, col + 3, "System", &tv_system, 0, 0);
-		print_time(line + 3, col + 3, "UTC", &tv_utc, 0, leap);
-		print_time(line + 4, col + 3, "TAI", &tv_tai, 0, 0);
-		print_time(line + 5, col + 3, NULL, &tv_utc, 1, leap);
+		print_time(line + 2, col + 4, "System", &tv_system, 0, 0);
+		print_time(line + 3, col + 4, "UTC", &tv_utc, 0, leap);
+		print_time(line + 4, col + 4, "TAI", &tv_tai, 0, 0);
+		print_time(line + 5, col + 4, NULL, &tv_utc, 1, leap);
 
 		if (!debug)
 			refresh();
