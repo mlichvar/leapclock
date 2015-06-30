@@ -98,7 +98,8 @@ int main(int argc, char **argv) {
 	WINDOW *win;
 	struct timeval tv_system, last_tv_system, tv_utc, tv_tai;
 	struct timex timex;
-	int tai_offset, last_tai_offset, ch, leap, step, slew, tick, slew_tick;
+	int tai_offset, last_tai_offset, ch, leap, step, slew;
+	int tick, preslew_tick, slew_tick;
 	int col, line;
 	double diff;
 
@@ -115,7 +116,7 @@ int main(int argc, char **argv) {
 	col = line = 0;
 	last_tai_offset = tai_offset = 0;
 	last_tv_system.tv_sec = last_tv_system.tv_usec = 0;
-	leap = step = slew = tick = slew_tick = 0;
+	leap = step = slew = preslew_tick = slew_tick = 0;
 
 	while ((ch = getch()) == ERR || ch == KEY_RESIZE) {
 		if (!debug) {
@@ -127,7 +128,7 @@ int main(int argc, char **argv) {
 		}
 
 		timex.modes = 0;
-		if (adjtimex(&timex) < 0)
+		if (ntp_adjtime(&timex) < 0)
 			return 1;
 
 		tv_system = timex.time;
@@ -153,14 +154,20 @@ int main(int argc, char **argv) {
 		last_tv_system = tv_system;
 		tv_utc = tv_system;
 
+#ifdef ADJ_TICK
+		tick = timex.tick;
+#else
+		tick = 10000;
+#endif
+
 		if (leap && tv_utc.tv_sec % 86400 == 0)
 			slew = 1;
 		if (slew) {
-			if (!slew_tick || slew_tick > timex.tick)
-				slew_tick = timex.tick;
-			diff = 1.0 - (double)(tick - slew_tick) / slew_tick *
+			if (!slew_tick || slew_tick > tick)
+				slew_tick = tick;
+			diff = 1.0 - (double)(preslew_tick - slew_tick) / slew_tick *
 				(tv_utc.tv_sec % 86400 + tv_utc.tv_usec / 1e6);
-			if (diff <= 0.0 || timex.tick > (tick + slew_tick) / 2) {
+			if (diff <= 0.0 || tick > (preslew_tick + slew_tick) / 2) {
 				diff = 0.0;
 				slew = slew_tick = 0;
 			}
@@ -171,7 +178,7 @@ int main(int argc, char **argv) {
 				tv_utc.tv_usec += 1000000;
 			}
 		} else {
-			tick = timex.tick;
+			preslew_tick = tick;
 		}
 
 		tv_tai = tv_utc;

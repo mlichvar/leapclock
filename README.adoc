@@ -1,9 +1,9 @@
 = leapclock
 
-+leapclock+ is a simple leap-second aware console clock for Linux. It displays
-system time, UTC, TAI and local time. The current TAI-UTC offset is obtained
-from the +right/UTC+ timezone. UTC and TAI are reconstructed from the system
-time and inserted leap seconds are shown as *:59:60.
++leapclock+ is a simple leap-second aware console clock. It displays system
+time, UTC, TAI and local time. The current TAI-UTC offset is obtained from the
++right/UTC+ timezone. UTC and TAI are reconstructed from the system time and
+inserted leap seconds are shown as *:59:60.
 
 The system clock is assumed to be synchronized to UTC by NTP. The following
 +ntpd+ and +chronyd+ configurations are supported:
@@ -11,7 +11,7 @@ The system clock is assumed to be synchronized to UTC by NTP. The following
 - +ntpd+ using the kernel discipline (i.e. no +-x+ option, +tinker step+ larger
   than 0.5 seconds or +disable kernel+ in ntp.conf)
 - +chronyd+ with the +leapsecmode+ option set to +system+ (default), +step+ or
-  +slew+
+  +slew+ on Linux
 
 Requirements:
 
